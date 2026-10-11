@@ -1,0 +1,9 @@
+{
+  "name": "pi-migration",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "migrate": "node ./migrate.mjs",
+    "test": "node --test"
+  }
+}

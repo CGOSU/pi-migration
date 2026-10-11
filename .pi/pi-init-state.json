@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "templateSchemaVersion": 1,
+  "language": "zh-CN",
+  "managedBlocks": {
+    "fast-path-wrap-up": {
+      "file": "AGENTS.md",
+      "hash": "589a2bc2c10301e14cc3a09b01a78a0d69fbb007b4505905b1f5134da0ac89d7"
+    }
+  }
+}

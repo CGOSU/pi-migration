@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "targetAgent": "pi",
+  "installationScope": "global",
+  "skills": [
+    {
+      "name": "coding-guidelines",
+      "source": "actionbook/rust-skills",
+      "sourceUrl": "https://github.com/actionbook/rust-skills.git",
+      "skillPath": "skills/coding-guidelines/SKILL.md"
+    },
+    {
+      "name": "design-taste-frontend",
+      "source": "Leonxlnx/taste-skill",
+      "sourceUrl": "https://github.com/Leonxlnx/taste-skill.git",
+      "skillPath": "skills/taste-skill/SKILL.md"
+    },
+    {
+      "name": "paper-polish",
+      "source": "HKUSTDial/Supervisor-Skills",
+      "sourceUrl": "https://github.com/HKUSTDial/Supervisor-Skills.git",
+      "skillPath": "skills/paper-polish/SKILL.md"
+    }
+  ]
+}

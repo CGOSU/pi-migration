@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "mode": "auto",
+  "workflowMode": "auto",
+  "workflowExecutor": "local",
+  "roleModels": {
+    "architect": {
+      "provider": "openai",
+      "model": "gpt-6.1-sol",
+      "thinkingLevel": "max"
+    },
+    "developer-test": {
+      "provider": "openai",
+      "model": "gpt-6-luna",
+      "thinkingLevel": "max"
+    },
+    "docs-commit": {
+      "provider": "openai",
+      "model": "gpt-6-luna",
+      "thinkingLevel": "high"
+    }
+  }
+}
