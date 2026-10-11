@@ -4,9 +4,9 @@
 
 ## 迁移边界
 
-快照 schema 当前为 v1，包含文件 SHA-256 完整性信息。导出仅处理实现明确支持的 Pi 配置文件、用户指令、agent 下的 Extensions/Skills/prompts/themes、本机 `~/.agents/skills` 内容及 package 声明；不递归打包整个用户目录或 agent 目录。远程 npm/Git package 的资源过滤保留，导入时通过 Pi CLI 安装；本地 package 和资源仅在受支持的 Pi/home 根目录内可表示时迁移。
+快照 schema 当前为 v1，包含文件 SHA-256 完整性信息。导出仅处理实现明确支持的 Pi 配置文件、用户指令、agent 下的 Extensions/Skills/prompts/themes、本机 `~/.agents/skills` 内容及 package 声明；不递归打包整个用户目录或 agent 目录。远程 npm/Git package 的资源过滤保留，导入时通过 Pi CLI 安装；本地 package 和资源仅在受支持的 Pi/home 根目录内可表示时迁移。MCP 服务器配置文件 `mcp.json` 明确排除：导出不会收集它，导入也不会改动目标机已有的 MCP 配置。
 
-以下内容不会迁移：API/OAuth 凭据、登录状态、会话、trust 数据、缓存、日志、数据库、`.env`、`.git`、`node_modules` 和依赖缓存。疑似凭据内容会导致安全拒绝；被过滤的设备/会话类字段会在报告中列出。不能安全表示的外部本地路径、损坏的清单或完整性校验失败会报错，不会被默默当作已迁移。快照仍可能含有私有指令、配置和本地代码，请使用可信存储和传输方式，不要公开发布。
+以下内容不会迁移：MCP 配置（`mcp.json`）、API/OAuth 凭据、登录状态、会话、trust 数据、缓存、日志、数据库、`.env`、`.git`、`node_modules` 和依赖缓存。疑似凭据内容会导致安全拒绝；被过滤的设备/会话类字段会在报告中列出。不能安全表示的外部本地路径、损坏的清单或完整性校验失败会报错，不会被默默当作已迁移。快照仍可能含有私有指令、配置和本地代码，请使用可信存储和传输方式，不要公开发布。
 
 新电脑上必须由用户自行认证。完成恢复后启动 Pi，并按提供商支持的方式手动运行 `/login` 或登录；迁移工具不会转移 OAuth 状态。ChatGPT Plus 是否能在当前 Pi 版本中使用，尚未在新环境验证，不作兼容承诺。
 
@@ -54,7 +54,7 @@ node ./migrate.mjs import --snapshot-dir "D:\pi-transfer\snapshot"
 node ./migrate.mjs import --snapshot-dir "D:\pi-transfer\snapshot" --home "D:\Users\new-user" --agent-dir "D:\Users\new-user\.pi\agent"
 ```
 
-导入前会验证整个清单、文件校验和、配置内容、目标冲突及符号链接边界。默认不覆盖内容不同的现存文件。仅在确认需要替换时加 `--overwrite`；将被替换的非敏感文件先备份到 `<home>/.pi-migration-backups/`。凭据/会话路径和含敏感内容的配置不会因 `--overwrite` 而允许写入。
+导入前会验证整个清单、文件校验和、配置内容、目标冲突及符号链接边界。包含 `mcp.json` 的旧快照会在写入或安装前拒绝，需重新导出；不会恢复其中的 MCP 配置。默认不覆盖内容不同的现存文件。仅在确认需要替换时加 `--overwrite`；将被替换的非敏感文件先备份到 `<home>/.pi-migration-backups/`，MCP 配置也不会被覆盖。凭据/会话路径和含敏感内容的配置不会因 `--overwrite` 而允许写入。
 
 导入输出会列出执行进度、已写文件、package 状态和所用备份目录。Pi package 安装属于外部副作用，失败时可能已部分安装，工具不会声称可完全回滚；遇到错误先检查输出的进度和目标状态，再决定是否重试。重复导入时，相同文件不会重写，package 声明按快照重建而不会累加重复项；每次真实导入仍会调用 Pi CLI 处理远程 package，其重复安装行为未在真实环境验证。
 
@@ -75,7 +75,7 @@ node ./migrate.mjs import --snapshot-dir "D:\pi-transfer\snapshot" --home "D:\Us
 
 - `migrate.mjs export/import` 及 `npm test` 已实现；测试使用临时目录与受控 package installer。已验证快照校验、安全拒绝、dry-run、冲突/备份、重复导入以及受控安装失败。
 - 已声明的远程 package 通过 Pi CLI 恢复；导出报告会提示未锁定的远程来源。实际 package 下载/安装没有在本机验证。package 依赖不打入快照；本地 package 的 `package.json` 若含 `dependencies` 字段，导入目前会保守地视为依赖未解析并在写入前失败（不会尝试解析或安装它们），而不会报告恢复成功。
-- 成功生成的报告会列出被过滤的设备/会话字段及目标环境处理项。若凭据或疑似敏感内容导致导出拒绝，则不会生成快照，安全错误不会回显敏感值；新环境认证和需要重配的 MCP/provider 设置必须人工补齐。
+- 成功生成的报告会列出被过滤的设备/会话字段及目标环境处理项，并明确标记 MCP 配置未迁移。需要使用 MCP 工具时，请在新电脑自行配置 `mcp.json`；该文件不随快照转移。其他认证也必须在新环境人工完成。若导出数据中的非 MCP 内容包含凭据或疑似敏感内容，导出会安全拒绝，且错误不会回显敏感值。
 - 未执行真实本机恢复、真实 npm/Git 安装、OAuth 登录或模型请求；新电脑上的完整恢复和 ChatGPT Plus 可用性仍需人工验证。
 
 ## Skills-only 旧入口

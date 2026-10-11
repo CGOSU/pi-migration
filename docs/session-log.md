@@ -10,6 +10,10 @@
 
 ### 2026-10-11
 
+- 完成：按用户要求排除 MCP 配置迁移；导出不收集 `mcp.json`，共享路径校验拒绝 MCP 配置路径，导入含 MCP 的旧快照会在写入前失败并保留目标配置。README、当前状态、实现边界、设计决策和会话记录同步更新。
+- 验证：`node --test test/exporter.test.mjs test/importer.test.mjs test/snapshot-core.test.mjs` — 42 项通过、0 失败、0 跳过。使用临时目录和受控 installer；未执行真实恢复、安装或 MCP 调用。此前的脱敏只读诊断仅确认触发文件为 `mcp.json`，没有输出配置值或修改 Pi 环境。
+- 遗留：新环境如需 MCP 工具，用户须自行配置；含 `mcp.json` 的旧快照必须重新导出。
+
 - 完成：核对当前 Skills-only 脚本、清单、Pi 文档及本机配置的非敏感结构；创建 `docs/implementation-plan.md`，更新项目定位与当前状态，并在 README 添加需求索引。
 - 验证：通过 `find`/`grep` 核对文件清单和调用关系；使用 Node.js 仅输出 settings/package/MCP 结构元数据进行脱敏核对；读取 Pi 配置、资源、包、模型、MCP、安全及平台文档。回读更新的文档做静态核对。未运行测试或真实迁移命令。
 - 遗留：当时迁移导出/恢复功能尚未实现；ChatGPT Plus 授权兼容性待新环境人工验证；当前目录不是 Git 仓库，无法创建 commit。

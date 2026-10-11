@@ -131,7 +131,7 @@ test("portable path validation rejects traversal, absolute paths, and excluded d
     assert.equal(validatePortablePath(input).error.code, ERROR_CODES.INVALID_PATH, input);
   }
 
-  for (const input of ["agent/auth.json", "home/.pi/agent/sessions/one.jsonl", "home/.env", "agent/node_modules/pkg/index.js"]) {
+  for (const input of ["agent/auth.json", "agent/mcp.json", "home/.pi/agent/MCP.JSON", "agent/extensions/mcp.json", "home/.pi/agent/sessions/one.jsonl", "home/.env", "agent/node_modules/pkg/index.js"]) {
     assert.equal(validatePortablePath(input).error.code, ERROR_CODES.SENSITIVE_CONTENT, input);
   }
 });

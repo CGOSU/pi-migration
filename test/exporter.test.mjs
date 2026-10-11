@@ -94,7 +94,8 @@ test("export writes a portable manifest and selected configuration/resources", a
       "agent/settings.json:$.sessionDir",
     ]);
     assert.deepEqual(result.value.report.unpinnedRemotePackageNumbers, [1]);
-    assert.deepEqual(result.value.report.includedConfigurationFiles, ["settings.json", "keybindings.json", "mcp.json", "models.json"]);
+    assert.deepEqual(result.value.report.includedConfigurationFiles, ["settings.json", "keybindings.json", "models.json"]);
+    assert.equal(result.value.report.excluded.includes("MCP configuration (mcp.json)"), true);
     assert.deepEqual(result.value.report.includedInstructionFiles, ["AGENTS.md"]);
     assert.equal(result.value.report.includedResourceRoots.some((resource) => resource.path === "home/.agents/skills"), true);
     assert.equal(result.value.report.requiredOnDestination.some((item) => item.includes("ChatGPT Plus")), true);
@@ -107,6 +108,7 @@ test("export writes a portable manifest and selected configuration/resources", a
 
     const filePaths = new Set(diskManifest.files.map((file) => file.path));
     assert.equal(filePaths.has("agent/settings.json"), true);
+    assert.equal(filePaths.has("agent/mcp.json"), false);
     assert.equal(filePaths.has("agent/AGENTS.md"), true);
     assert.equal(filePaths.has("agent/extensions/custom.ts"), true);
     assert.equal(filePaths.has("agent/local-package/extensions/local.ts"), true);
@@ -144,24 +146,25 @@ test("dry-run builds a report without creating the snapshot directory", async ()
   });
 });
 
-test("credential-bearing configuration fails before publishing and preserves an older snapshot", async () => {
+test("MCP configuration is excluded even when it contains secrets or absolute paths", async () => {
   await withTempDirectory(async (directory) => {
     const fixture = await createSourceFixture(directory);
-    const first = await exportSnapshot(fixture);
-    assert.equal(first.ok, true);
-    const previousManifest = await readFile(path.join(fixture.snapshotDir, "manifest.json"), "utf8");
-
     const secret = "mcp-config-secret-canary";
     await writeFile(path.join(fixture.agentDir, "mcp.json"), JSON.stringify({
-      mcpServers: { docs: { env: { DOCS_TOKEN: secret } } },
+      mcpServers: {
+        docs: {
+          command: path.join(directory, "private", "server.exe"),
+          env: { DOCS_TOKEN: secret },
+        },
+      },
     }));
-    const failed = await exportSnapshot({ ...fixture, overwrite: true });
 
-    assert.equal(failed.ok, false);
-    assert.equal(failed.error.code, ERROR_CODES.SENSITIVE_CONTENT);
-    assert.deepEqual(failed.progress, { snapshotPublished: false, previousDestinationPreserved: true });
-    assert.equal(JSON.stringify(failed).includes(secret), false);
-    assert.equal(await readFile(path.join(fixture.snapshotDir, "manifest.json"), "utf8"), previousManifest);
+    const result = await exportSnapshot(fixture);
+
+    assert.equal(result.ok, true, result.error?.message);
+    assert.equal(result.value.manifest.files.some((file) => file.path.toLowerCase() === "agent/mcp.json"), false);
+    assert.equal(result.value.report.excluded.includes("MCP configuration (mcp.json)"), true);
+    assert.equal((await readFile(path.join(fixture.snapshotDir, "manifest.json"), "utf8")).includes(secret), false);
   });
 });
 
@@ -231,11 +234,11 @@ test("export rejects a configured resource path that crosses a symlink", async (
   });
 });
 
-test("export rejects config values with absolute local paths", async () => {
+test("export still rejects absolute local paths in migrated configuration", async () => {
   await withTempDirectory(async (directory) => {
     const fixture = await createSourceFixture(directory);
-    await writeFile(path.join(fixture.agentDir, "mcp.json"), JSON.stringify({
-      mcpServers: { local: { command: path.join(directory, "private", "server.exe"), args: [] } },
+    await writeFile(path.join(fixture.agentDir, "models.json"), JSON.stringify({
+      providers: { local: { command: path.join(directory, "private", "provider.exe") } },
     }));
 
     const result = await exportSnapshot(fixture);

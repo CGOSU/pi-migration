@@ -104,6 +104,10 @@ async function writeTargetRuntimeState(agentDir) {
 test("import restores portable resources and filtered package settings, and remains idempotent", async () => {
   await withTempDirectory(async (directory) => {
     const fixture = await createFixture(directory);
+    const targetMcpPath = path.join(fixture.targetAgentDir, "mcp.json");
+    const targetMcpContent = JSON.stringify({ mcpServers: { target: { command: "target-only-server" } } });
+    await mkdir(fixture.targetAgentDir, { recursive: true });
+    await writeFile(targetMcpPath, targetMcpContent);
     let mutationCount = 0;
     const installer = makeInstaller({
       onInstall: async (_source, agentDir) => {
@@ -124,6 +128,7 @@ test("import restores portable resources and filtered package settings, and rema
 
     assert.equal(first.ok, true, first.error?.message);
     assert.equal(first.value.progress.packagesInstalled.length, 1);
+    assert.equal(await readFile(targetMcpPath, "utf8"), targetMcpContent);
     assert.equal(installer.calls.check, 1);
     assert.deepEqual(installer.calls.installs.map((item) => item.source), ["npm:@example/pi-tools@1.2.3"]);
     assert.equal(await readFile(path.join(fixture.targetAgentDir, "extensions", "local.ts"), "utf8"), "export default 'local extension';");
@@ -152,7 +157,45 @@ test("import restores portable resources and filtered package settings, and rema
     }, { packageInstaller: installer.packageInstaller });
     assert.equal(second.ok, true, second.error?.message);
     assert.deepEqual(JSON.parse(await readFile(path.join(fixture.targetAgentDir, "settings.json"), "utf8")).packages, settings.packages);
+    assert.equal(await readFile(targetMcpPath, "utf8"), targetMcpContent);
     assert.equal(mutationCount, 2);
+  });
+});
+
+test("legacy snapshots containing MCP configuration are rejected before target writes", async () => {
+  await withTempDirectory(async (directory) => {
+    const fixture = await createFixture(directory);
+    const mcpContent = Buffer.from(JSON.stringify({ mcpServers: { old: { command: "old-machine-server" } } }));
+    await mkdir(path.join(fixture.snapshotDir, "agent"), { recursive: true });
+    await writeFile(path.join(fixture.snapshotDir, "agent", "mcp.json"), mcpContent);
+    const manifestPath = path.join(fixture.snapshotDir, "manifest.json");
+    const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
+    manifest.files.push({
+      path: "agent/mcp.json",
+      size: mcpContent.byteLength,
+      sha256: createHash("sha256").update(mcpContent).digest("hex"),
+    });
+    await writeFile(manifestPath, JSON.stringify(manifest));
+    const targetMcpPath = path.join(fixture.targetAgentDir, "mcp.json");
+    const targetMcpContent = "target MCP settings remain untouched";
+    await mkdir(fixture.targetAgentDir, { recursive: true });
+    await writeFile(targetMcpPath, targetMcpContent);
+    const installer = makeInstaller();
+
+    const result = await importSnapshot({
+      home: fixture.targetHome,
+      agentDir: fixture.targetAgentDir,
+      snapshotDir: fixture.snapshotDir,
+      overwrite: true,
+    }, { packageInstaller: installer.packageInstaller });
+
+    assert.equal(result.ok, false);
+    assert.equal(result.error.code, ERROR_CODES.SENSITIVE_CONTENT);
+    assert.equal(result.progress.snapshotVerified, false);
+    assert.equal(await readFile(targetMcpPath, "utf8"), targetMcpContent);
+    assert.equal(installer.calls.check, 0);
+    assert.deepEqual(installer.calls.installs, []);
+    await assert.rejects(readFile(path.join(fixture.targetAgentDir, "settings.json")), { code: "ENOENT" });
   });
 });
 
