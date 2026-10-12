@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    {
+      "path": "agent/settings.json",
+      "size": 549,
+      "sha256": "9e923b96baca305134b81fd3af6a5e1dbe290f5e54e5ae431af14c744d499941"
+    },
+    {
+      "path": "agent/models.json",
+      "size": 22,
+      "sha256": "f6a60ffe718b445a923e5d870ff3b23ced2a8e42ef7322a0494c48c788e66e10"
+    },
+    {
+      "path": "agent/AGENTS.md",
+      "size": 7971,
+      "sha256": "03ca5c656c0398f2826e4edbfc619b2bf4cca3ac4006f595c098eda808a07e21"
+    },
+    {
+      "path": "home/.agents/skills/coding-guidelines/clippy-lints/_index.md",
+      "size": 697,
+      "sha256": "f9a2099d99c522fa27c3829e15e0b13cf25ee159732f8c6536857389af23f75d"
+    },
+    {
+      "path": "home/.agents/skills/coding-guidelines/index/rules-index.md",
+      "size": 176,
+      "sha256": "713dfe202b958e99a681a48d3c71212daa4166e8d4cad978c13802dc49b80f23"
+    },
+    {
+      "path": "home/.agents/skills/coding-guidelines/SKILL.md",
+      "size": 3178,
+      "sha256": "b561036b0f8ae28dc264d09933433d08db09c6d6a0dfe04284b1493f233d7a59"
+    },
+    {
+      "path": "home/.agents/skills/design-taste-frontend/SKILL.md",
+      "size": 88459,
+      "sha256": "2e064e92aca020b2e0bad69326fe7ea55d59005ed53d1a8cbce1bd135d44b8b3"
+    },
+    {
+      "path": "home/.agents/skills/paper-polish/references/academic-phrasebank.md",
+      "size": 4657,
+      "sha256": "006ed303633a6e6a1efb6743e02fa77eaddefcbd5ad619eb5d019a8b989eaf0f"
+    },
+    {
+      "path": "home/.agents/skills/paper-polish/references/ai-tone-guardrails.md",
+      "size": 4597,
+      "sha256": "80bdd7b65e28fae404f3ced641e7ddedc1ba13f83b1db87ffa03a30aa6c8f5ca"
+    },
+    {
+      "path": "home/.agents/skills/paper-polish/references/section-conventions.md",
+      "size": 4519,
+      "sha256": "b72974702bb818e3477e954bde54d6aa4bab911122c15524e0de334f1e6657d7"
+    },
+    {
+      "path": "home/.agents/skills/paper-polish/SKILL.md",
+      "size": 12578,
+      "sha256": "7000d068e8ce6290776ff0992e0dafd968e649756f24a08f9e4473a58c6a119b"
+    }
+  ],
+  "packages": [
+    {
+      "kind": "remote",
+      "source": "git:github.com/CGOSU/pi-agent-browser.git"
+    },
+    {
+      "kind": "remote",
+      "source": "git:github.com/CGOSU/pi-token-speed.git"
+    },
+    {
+      "kind": "remote",
+      "source": "git:github.com/CGOSU/pi-init.git"
+    },
+    {
+      "kind": "remote",
+      "source": "npm:@ff-labs/pi-fff"
+    },
+    {
+      "kind": "remote",
+      "source": "git:github.com/NVlabs/SoL-Pi"
+    }
+  ],
+  "resources": [
+    {
+      "kind": "skill",
+      "path": "home/.agents/skills"
+    }
+  ],
+  "report": {
+    "includedFiles": 11,
+    "includedResources": 1,
+    "includedCategories": [
+      {
+        "category": "Pi configuration files",
+        "count": 2
+      },
+      {
+        "category": "user instruction files",
+        "count": 1
+      },
+      {
+        "category": "local resource roots",
+        "count": 1
+      },
+      {
+        "category": "package declarations",
+        "count": 5
+      }
+    ],
+    "includedConfigurationFiles": [
+      "settings.json",
+      "models.json"
+    ],
+    "includedInstructionFiles": [
+      "AGENTS.md"
+    ],
+    "includedResourceRoots": [
+      {
+        "kind": "skill",
+        "path": "home/.agents/skills"
+      }
+    ],
+    "remotePackages": 5,
+    "localPackages": 0,
+    "unpinnedRemotePackages": 5,
+    "unpinnedRemotePackageNumbers": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "omittedConfigurationFields": [
+      "agent/settings.json:$.lastChangelogVersion",
+      "agent/settings.json:$.deviceId"
+    ],
+    "omittedConfigurationFieldCount": 2,
+    "excluded": [
+      "MCP configuration (mcp.json)",
+      "credentials and login state",
+      "sessions and trust decisions",
+      "caches, logs, databases, runtime state and node_modules/dependencies"
+    ],
+    "skippedSensitivePaths": 0,
+    "skippedSymlinks": 0,
+    "skippedOtherEntries": 0,
+    "requiredOnDestination": [
+      "Pi must already be installed",
+      "Install packages listed in the manifest; package dependencies are not bundled",
+      "Authenticate separately on the new computer",
+      "Verify provider availability after login; ChatGPT Plus compatibility is not guaranteed",
+      "Review unpinned remote package references: 1, 2, 3, 4, 5"
+    ]
+  }
+}
