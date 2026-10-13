@@ -77,6 +77,10 @@
     {
       "kind": "remote",
       "source": "git:github.com/NVlabs/SoL-Pi"
+    },
+    {
+      "kind": "remote",
+      "source": "git:github.com/CGOSU/pi-graph.git"
     }
   ],
   "resources": [
@@ -103,7 +107,7 @@
       },
       {
         "category": "package declarations",
-        "count": 5
+        "count": 6
       }
     ],
     "includedConfigurationFiles": [
@@ -119,15 +123,16 @@
         "path": "home/.agents/skills"
       }
     ],
-    "remotePackages": 5,
+    "remotePackages": 6,
     "localPackages": 0,
-    "unpinnedRemotePackages": 5,
+    "unpinnedRemotePackages": 6,
     "unpinnedRemotePackageNumbers": [
       1,
       2,
       3,
       4,
-      5
+      5,
+      6
     ],
     "omittedConfigurationFields": [
       "agent/settings.json:$.lastChangelogVersion",
@@ -148,7 +153,7 @@
       "Install packages listed in the manifest; package dependencies are not bundled",
       "Authenticate separately on the new computer",
       "Verify provider availability after login; ChatGPT Plus compatibility is not guaranteed",
-      "Review unpinned remote package references: 1, 2, 3, 4, 5"
+      "Review unpinned remote package references: 1, 2, 3, 4, 5, 6"
     ]
   }
 }
